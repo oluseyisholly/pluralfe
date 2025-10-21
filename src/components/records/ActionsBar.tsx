@@ -1,5 +1,8 @@
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "../ui/button";
+import LogoLeft from "../../assets/Stroke 165.svg";
+import hospitalAppointment from "../../assets/hospital appointment.svg";
+import plusCircle from "../../assets/plus-circle.svg";
 
 export interface ActionsBarProps {
   onAddPatient: () => void;
@@ -28,16 +31,19 @@ export function ActionsBar({
   const end = Math.min(total, (page + 1) * pageSize);
 
   return (
-    <div className="flex flex-col gap-3 border-b border-slate-200 bg-white px-4 py-4 md:flex-row md:items-center md:justify-between md:px-10">
-      <div className="flex flex-wrap items-center gap-3">
-        <Button variant="primary" onClick={onAddPatient} className="gap-2">
-          <Plus className="h-4 w-4" /> Add new patient
+    <div className="flex flex-col gap-3   py-4  md:items-center md:justify-between">
+      <div className="flex flex-wrap items-center gap-3 justify-between w-full ">
+        <Button variant="default" onClick={onAddPatient} className="gap-2">
+          <img src={hospitalAppointment} />
+          Add new patient
         </Button>
-        <Button variant="soft" onClick={onCreateAppointment} className="gap-2">
-          <Plus className="h-4 w-4" /> Create appointment
+
+        <Button variant="default" onClick={onCreateAppointment} className="gap-2">
+          <img src={plusCircle} />
+          Create appointment
         </Button>
       </div>
-      <div className="flex items-center justify-between gap-3 text-sm text-slate-500 md:justify-end">
+      <div className="flex items-center justify-end gap-3 text-sm text-slate-500 w-full">
         <span>
           {start}
           {total > 0 ? `–${end}` : ""} of {total}
@@ -50,7 +56,7 @@ export function ActionsBar({
             disabled={disablePrev}
             aria-label="Previous page"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <img src={LogoLeft} />
           </Button>
           <Button
             variant="outline"
@@ -59,7 +65,10 @@ export function ActionsBar({
             disabled={disableNext}
             aria-label="Next page"
           >
-            <ChevronRight className="h-4 w-4" />
+            <img
+              className="transform rotate-180 transition-transform"
+              src={LogoLeft}
+            />
           </Button>
         </div>
       </div>

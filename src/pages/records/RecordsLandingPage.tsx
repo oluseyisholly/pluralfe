@@ -32,12 +32,8 @@ export function RecordsLandingPage() {
 
   return (
     <AppLayout currentDate={new Date()} userName="Mr Daniel">
-      <section className="flex flex-col gap-4 rounded-3xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-4 border-b border-slate-200 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-10">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Records</h1>
-            <p className="text-sm text-slate-500">Monitor today’s appointments and manage patient flow.</p>
-          </div>
+      <section className="flex flex-col gap-4 border-slate-200 ">
+        <div className="flex  gap-4 px-4 py-4 md:flex-row md:items-center justify-center md:px-10">
           <GlobalSearch onSearch={setSearchQuery} />
         </div>
         <ActionsBar
@@ -51,15 +47,15 @@ export function RecordsLandingPage() {
           pageSize={PAGE_SIZE}
           total={total}
         />
-        <FiltersRow
+        {/* <FiltersRow
           activeTab={activeTab}
           onTabChange={setActiveTab}
           clinic={clinic}
           onClinicChange={setClinic}
           sort={sort}
           onSortChange={setSort}
-        />
-        <div className="flex flex-col gap-4 px-4 pb-6 md:px-10">
+        /> */}
+        <div className="flex flex-col gap-4  pb-6">
           <AppointmentsList
             appointments={APPOINTMENTS}
             searchQuery={searchQuery}
