@@ -1,11 +1,11 @@
 import * as React from "react";
 import { useCallback } from "react";
-import { APPOINTMENTS } from "../../data/appointments";
 import { ActionsBar } from "../../components/records/ActionsBar";
 import { AppointmentsList } from "../../components/records/AppointmentsList";
-import { FiltersRow } from "../../components/records/FiltersRow";
 import { GlobalSearch } from "../../components/records/GlobalSearch";
 import { AppLayout } from "../../layouts/AppLayout";
+import { fetchAppointments } from "../../lib/appointments";
+import { useQuery } from "../../lib/react-query";
 
 const PAGE_SIZE = 20;
 
@@ -14,8 +14,15 @@ export function RecordsLandingPage() {
   const [clinic, setClinic] = React.useState("All clinics");
   const [sort, setSort] = React.useState("time-asc");
   const [page, setPage] = React.useState(0);
-  const [total, setTotal] = React.useState(APPOINTMENTS.length);
+  const [total, setTotal] = React.useState(0);
   const [activeTab, setActiveTab] = React.useState("appointments");
+
+  const appointmentsQueryKey = React.useMemo(() => ["appointments"] as const, []);
+
+  const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
+    queryKey: appointmentsQueryKey,
+    queryFn: fetchAppointments,
+  });
 
   const handleTotalChange = useCallback((count: number) => {
     setTotal(count);
@@ -57,13 +64,18 @@ export function RecordsLandingPage() {
         /> */}
         <div className="flex flex-col gap-4  pb-6">
           <AppointmentsList
-            appointments={APPOINTMENTS}
+            appointments={data}
             searchQuery={searchQuery}
             clinic={clinic}
             sort={sort}
             page={page}
             pageSize={PAGE_SIZE}
             onTotalChange={handleTotalChange}
+            isLoading={isLoading}
+            isFetching={isFetching}
+            isError={isError}
+            errorMessage={error instanceof Error ? error.message : undefined}
+            onRetry={refetch}
           />
         </div>
       </section>

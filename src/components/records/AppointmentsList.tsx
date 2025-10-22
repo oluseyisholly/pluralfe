@@ -3,13 +3,18 @@ import { AppointmentRecord } from "../../data/appointments";
 import { AppointmentRow } from "./AppointmentRow";
 
 export interface AppointmentsListProps {
-  appointments: AppointmentRecord[];
+  appointments?: AppointmentRecord[];
   searchQuery: string;
   clinic: string;
   sort: string;
   page: number;
   pageSize: number;
   onTotalChange: (total: number) => void;
+  isLoading?: boolean;
+  isFetching?: boolean;
+  isError?: boolean;
+  errorMessage?: string;
+  onRetry?: () => void;
 }
 
 const sorters: Record<string, (a: AppointmentRecord, b: AppointmentRecord) => number> = {
@@ -28,10 +33,17 @@ export function AppointmentsList({
   page,
   pageSize,
   onTotalChange,
+  isLoading = false,
+  isFetching = false,
+  isError = false,
+  errorMessage,
+  onRetry,
 }: AppointmentsListProps) {
+  const safeAppointments = appointments ?? [];
+
   const filtered = React.useMemo(() => {
     const normalisedQuery = searchQuery.toLowerCase();
-    return appointments.filter((appointment) => {
+    return safeAppointments.filter((appointment) => {
       const matchesQuery = normalisedQuery
         ? appointment.patient.name.toLowerCase().includes(normalisedQuery) ||
           appointment.patient.id.toLowerCase().includes(normalisedQuery)
@@ -42,7 +54,7 @@ export function AppointmentsList({
 
       return matchesQuery && matchesClinic;
     });
-  }, [appointments, searchQuery, clinic]);
+  }, [safeAppointments, searchQuery, clinic]);
 
   const sorted = React.useMemo(() => {
     const sorter = sorters[sort] ?? sorters["time-asc"];
@@ -55,8 +67,40 @@ export function AppointmentsList({
   }, [sorted, page, pageSize]);
 
   React.useEffect(() => {
+    if (isLoading || isError) {
+      return;
+    }
+
     onTotalChange(sorted.length);
-  }, [sorted, onTotalChange]);
+  }, [sorted, onTotalChange, isLoading, isError]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-1 items-center justify-center rounded-2xl border border-slate-200 bg-white/50 p-12 text-center">
+        <p className="text-lg font-semibold text-slate-600">Loading appointments…</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 rounded-2xl border border-red-200 bg-red-50/80 p-12 text-center">
+        <p className="text-lg font-semibold text-red-700">Unable to load appointments</p>
+        <p className="text-sm text-red-600">
+          {errorMessage ?? "Something went wrong while fetching appointment data."}
+        </p>
+        {onRetry ? (
+          <button
+            type="button"
+            className="rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm transition hover:bg-red-100"
+            onClick={onRetry}
+          >
+            Try again
+          </button>
+        ) : null}
+      </div>
+    );
+  }
 
   if (!sorted.length) {
     return (
@@ -76,6 +120,11 @@ export function AppointmentsList({
       {paged.map((appointment) => (
         <AppointmentRow key={appointment.id} appointment={appointment} />
       ))}
+      {isFetching && !isLoading ? (
+        <div className="rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-center text-sm text-slate-500">
+          Refreshing…
+        </div>
+      ) : null}
     </div>
   );
 }
